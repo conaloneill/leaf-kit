@@ -10,7 +10,8 @@ public var defaultTags: [String: LeafTag] = [
     "capitalized": Capitalized(),
     "contains": Contains(),
     "date": DateTag(),
-    "count": Count()
+    "count": Count(),
+    "firstElement": FirstElement()
 ]
 
 struct Lowercased: LeafTag {
@@ -37,6 +38,19 @@ struct Capitalized: LeafTag {
             throw "unable to capitalize unexpected data"
         }
         return .init(.string(str.capitalized))
+    }
+}
+
+struct Count: LeafTag {
+    func render(_ ctx: LeafContext) throws -> LeafData {
+        try ctx.requireParameterCount(1)
+        if let array = ctx.parameters[0].array {
+            return LeafData.int(array.count)
+        } else if let dictionary = ctx.parameters[0].dictionary {
+            return LeafData.int(dictionary.count)
+        } else {
+            throw "Unable to convert count parameter to LeafData collection"
+        }
     }
 }
 
@@ -75,15 +89,21 @@ struct DateTag: LeafTag {
     }
 }
 
-struct Count: LeafTag {
+struct FirstElement: LeafTag {
     func render(_ ctx: LeafContext) throws -> LeafData {
         try ctx.requireParameterCount(1)
         if let array = ctx.parameters[0].array {
-            return LeafData.int(array.count)
-        } else if let dictionary = ctx.parameters[0].dictionary {
-            return LeafData.int(dictionary.count)
+            guard let tmp = array.first else {
+                throw "Unable to unwrap first element in array"
+            }
+            return tmp
+        } else if let dict = ctx.parameters[0].dictionary {
+            guard let tmp = dict.first else {
+                throw "Unable to unwrap first element in dictionary"
+            }
+            return tmp.value
         } else {
-            throw "Unable to convert count parameter to LeafData collection"
+            throw "Unable to convert parameters into an array or a dictionary"
         }
     }
 }

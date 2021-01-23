@@ -60,7 +60,15 @@ final class LeafTests: XCTestCase {
         """
         try XCTAssertEqual(render(template, ["foo": "BAR"]), "<p>bar</p>")
     }
+    
 
+    func testContainsFail() throws {
+        let template = """
+        <p>#(contains(nameList, "Tanner"))</p>
+        """
+        try XCTAssertEqual(render(template, ["nameList": ["Swift","Logan","Vapor"]]), "<p>false</p>")
+    }
+    
     func testExpression() throws {
         let template = "#(age > 99)"
         try XCTAssertEqual(render(template, ["age": 21]), "false")
@@ -201,6 +209,28 @@ final class LeafTests: XCTestCase {
         """
         try XCTAssertEqual(render(template, ["array": ["","","",""]]), expected)
     }
+    
+        
+    func testUppercased() throws {
+        let template = """
+        <p>#(uppercased(foo))</p>
+        """
+        try XCTAssertEqual(render(template, ["foo": "bar"]), "<p>BAR</p>")
+    }
+    
+    func testCapitalized() throws {
+        let template = """
+        <p>#(capitalized(foo))</p>
+        """
+        try XCTAssertEqual(render(template, ["foo": "bar"]), "<p>Bar</p>")
+    }
+    
+    func testContains() throws {
+        let template = """
+        <p>#(contains(nameList, "Tanner"))</p>
+        """
+        try XCTAssertEqual(render(template, ["nameList": ["Tanner","Logan","Vapor"]]), "<p>true</p>")
+    }
 
     func testDateFormat() throws {
         let template = """
@@ -212,6 +242,13 @@ final class LeafTests: XCTestCase {
         """
         try XCTAssertEqual(render(template, ["foo": 1_337_000]), expected)
 
+    }
+    
+    func testFirstElement() throws {
+        let template = """
+        <p>#(firstElement(nameList))</p>
+        """
+        try XCTAssertEqual(render(template, ["nameList": ["Tanner","Logan","Vapor"]]), "<p>Tanner</p>")
     }
 
     func testEmptyForLoop() throws {
